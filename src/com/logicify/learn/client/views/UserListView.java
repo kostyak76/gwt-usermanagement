@@ -2,8 +2,8 @@ package com.logicify.learn.client.views;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.*;
-import com.logicify.learn.client.models.User;
-import com.logicify.learn.client.models.UserList;
+import com.logicify.learn.shared.User;
+import com.logicify.learn.shared.UserList;
 import com.logicify.learn.client.presenters.UserListPresenter;
 
 import java.util.ArrayList;
@@ -46,14 +46,14 @@ public class UserListView extends Composite implements UserListPresenter.View {
         flexTable.setText(0, 3, "E-mail");
         flexTable.setText(0, 4, "Actions");
 
-        for (int i = 0; i < userList.length(); i++) {
+        for (int i = 0; i < userList.size(); i++) {
             //fill flextable
             User user = (User) userList.get(i);
             int rowMove = i + 1;
-            flexTable.setText(rowMove, 0, user.getId());
-            flexTable.setText(rowMove, 1, user.getFirstName());
-            flexTable.setText(rowMove, 2, user.getLastName());
-            flexTable.setText(rowMove, 3, user.getEmail());
+            flexTable.setText(rowMove, 0, user._id);
+            flexTable.setText(rowMove, 1, user.firstName);
+            flexTable.setText(rowMove, 2, user.lastName);
+            flexTable.setText(rowMove, 3, user.email);
 
             Button delButton = new Button("x");
             deleteButtons.add(delButton);

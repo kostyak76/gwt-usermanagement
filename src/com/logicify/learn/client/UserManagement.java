@@ -2,7 +2,7 @@ package com.logicify.learn.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.*;
-import com.logicify.learn.client.models.User;
+import com.logicify.learn.shared.User;
 import com.logicify.learn.client.presenters.UserListPresenter;
 import com.logicify.learn.client.presenters.UserListPresenterListener;
 import com.logicify.learn.client.presenters.UserPresenter;

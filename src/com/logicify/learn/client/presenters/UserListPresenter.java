@@ -2,7 +2,6 @@ package com.logicify.learn.client.presenters;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -15,8 +14,9 @@ import com.logicify.learn.client.common.Config;
 import com.logicify.learn.client.common.HasListeners;
 import com.logicify.learn.client.common.Listener;
 import com.logicify.learn.client.common.NotifyListenersCallback;
-import com.logicify.learn.client.models.User;
-import com.logicify.learn.client.models.UserList;
+import com.logicify.learn.shared.GeneralResponse;
+import com.logicify.learn.shared.User;
+import com.logicify.learn.shared.UserList;
 import com.logicify.learn.client.UserServiceAsync;
 
 import java.util.ArrayList;
@@ -73,12 +73,12 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
     private void getUserListAndInitView() {
         // get user data using callback function
 
-        AsyncCallback<String> callback = new AsyncCallbackJSON() {
+        AsyncCallback<GeneralResponse> callback = new AsyncCallbackJSON() {
             @Override
-            public void doStuffWithObject(JSONObject obj) {
+            public void doStuffWithObject(GeneralResponse obj) {
                 // convert data
-                userList = (UserList) obj.get("data").isArray().getJavaScriptObject();
-
+                //userList = (UserList) obj.get("data").isArray().getJavaScriptObject();
+                userList = (UserList) obj.data;
                 initView();
             }
         };
@@ -164,14 +164,14 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
             return;
         }
 
-        AsyncCallback asyncCallback = new AsyncCallbackJSON() {
+        AsyncCallback<GeneralResponse> asyncCallback = new AsyncCallbackJSON() {
             @Override
-            public void doStuffWithObject(JSONObject obj) {
+            public void doStuffWithObject(GeneralResponse obj) {
                 getUserListAndInitView();
             }
         };
         User user = (User) userList.get(i);
-        String userId = user.getId();
+        String userId = user._id;
         String url = Config.API_URL+"user/"+userId;
 
         rpcService.deleteUser(url, asyncCallback);

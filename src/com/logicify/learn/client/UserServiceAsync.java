@@ -1,6 +1,7 @@
 package com.logicify.learn.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicify.learn.shared.GeneralResponse;
 
 import java.util.ArrayList;
 
@@ -12,11 +13,11 @@ import java.util.ArrayList;
  */
 public interface UserServiceAsync {
 
-    void getUserList(String url, AsyncCallback<String> async);
+    void getUserList(String url, AsyncCallback<GeneralResponse> async);
 
-    void saveUser(String url, String userRawData, AsyncCallback<String> async);
+    void saveUser(String url, String userRawData, AsyncCallback<GeneralResponse> async);
 
-    void deleteUser(String url, AsyncCallback<String> async);
+    void deleteUser(String url, AsyncCallback<GeneralResponse> async);
 
-    void updateUser(String url, String userRawData, AsyncCallback<String> async);
+    void updateUser(String url, String userRawData, AsyncCallback<GeneralResponse> async);
 }

@@ -1,18 +1,15 @@
 package com.logicify.learn.client.views;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.InputElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.logicify.learn.client.models.User;
+import com.logicify.learn.shared.User;
 import com.logicify.learn.client.presenters.UserPresenter;
 
 /**
@@ -47,7 +44,7 @@ public class UserView extends Composite implements UserPresenter.View {
     Button clearButton;
 
     @UiHandler("clearButton")
-    void clearMethod(ClickEvent event){
+    void clearMethod(MouseMoveEvent event){
         clearFormData();
     }
 
@@ -93,9 +90,9 @@ public class UserView extends Composite implements UserPresenter.View {
     @Override
     public void loadUSer(User user) {
         //load user
-        firstName.setText(user.getFirstName());
-        lastName.setText(user.getLastName());
-        email.setText(user.getEmail());
+        firstName.setText(user.firstName);
+        lastName.setText(user.lastName);
+        email.setText(user.email);
     }
 
     @Override

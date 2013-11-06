@@ -3,6 +3,7 @@ package com.logicify.learn.client;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.core.client.GWT;
+import com.logicify.learn.shared.GeneralResponse;
 
 import java.util.ArrayList;
 
@@ -26,11 +27,11 @@ public interface UserService extends RemoteService {
         }
     }
 
-    public String getUserList(String url) throws UserServiceException;
+    public GeneralResponse getUserList(String url) throws UserServiceException;
 
-    public String saveUser(String url, String userRawData) throws UserServiceException;
+    public GeneralResponse saveUser(String url, String userRawData) throws UserServiceException;
 
-    public String deleteUser(String url) throws UserServiceException;
+    public GeneralResponse deleteUser(String url) throws UserServiceException;
 
-    public String updateUser(String url, String userRawData) throws UserServiceException;
+    public GeneralResponse updateUser(String url, String userRawData) throws UserServiceException;
 }

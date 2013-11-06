@@ -14,9 +14,8 @@ import com.logicify.learn.client.common.Config;
 import com.logicify.learn.client.common.HasListeners;
 import com.logicify.learn.client.common.Listener;
 import com.logicify.learn.client.common.NotifyListenersCallback;
-import com.logicify.learn.client.models.User;
-
-import java.util.ArrayList;
+import com.logicify.learn.shared.GeneralResponse;
+import com.logicify.learn.shared.User;
 
 /**
  * Created with IntelliJ IDEA.
@@ -96,9 +95,9 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
                 // getData as formString
                 String formString = view.getFormData();
                 String url = Config.API_URL+"user";
-                AsyncCallback asyncCallback = new AsyncCallbackJSON() {
+                AsyncCallback<GeneralResponse> asyncCallback = new AsyncCallbackJSON() {
                     @Override
-                    public void doStuffWithObject(JSONObject obj) {
+                    public void doStuffWithObject(GeneralResponse obj) {
 
                         Window.alert("Added successfully");
 
@@ -131,12 +130,12 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
                     return;
                 }
                 // perform request
-                String url = Config.API_URL+"user/" + currentUser.getId();
+                String url = Config.API_URL+"user/" + currentUser._id;
                 String userRawData = view.getFormData();
 
-                AsyncCallback asyncCallback = new AsyncCallbackJSON() {
+                AsyncCallback<GeneralResponse> asyncCallback = new AsyncCallbackJSON() {
                     @Override
-                    public void doStuffWithObject(JSONObject obj) {
+                    public void doStuffWithObject(GeneralResponse obj) {
                         Window.alert("Updated successfully");
 
                         //notify listeners

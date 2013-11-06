@@ -1,7 +1,7 @@
 package com.logicify.learn.client.presenters;
 
 import com.logicify.learn.client.common.Listener;
-import com.logicify.learn.client.models.User;
+import com.logicify.learn.shared.User;
 
 /**
  * Created with IntelliJ IDEA.

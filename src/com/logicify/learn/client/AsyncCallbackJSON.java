@@ -4,6 +4,8 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicify.learn.shared.GeneralResponse;
+import com.logicify.learn.shared.UserList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +18,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * abstract class to instantiate AsyncCallback with json data received
  * is typical for that project
  */
-public abstract class AsyncCallbackJSON implements AsyncCallback<String>{
+public abstract class AsyncCallbackJSON implements AsyncCallback<GeneralResponse>{
     @Override
     public void onFailure(Throwable caught) {
         // implement error handler for better user experience
@@ -24,15 +26,14 @@ public abstract class AsyncCallbackJSON implements AsyncCallback<String>{
     }
 
     @Override
-    public void onSuccess(String result) {
+    public void onSuccess(GeneralResponse result) {
         // parse result as json representations
-        JSONObject jsonObject = JSONParser.parseStrict(result).isObject();
-        doStuffWithObject(jsonObject);
+        doStuffWithObject(result);
     }
 
     /**
      * define to fetch a correct data
-     * @param obj define concrete operations with parsed JSONObject
+     * @param responseWithData define concrete operations with response
      */
-    public abstract void doStuffWithObject(JSONObject obj);
+    public abstract void doStuffWithObject(GeneralResponse responseWithData);
 }

@@ -1,12 +1,14 @@
 package com.logicify.learn.server;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicify.learn.client.UserService;
 import com.logicify.learn.client.UserServiceException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
+import com.logicify.learn.shared.GeneralResponse;
+import com.logicify.learn.shared.User;
+import com.logicify.learn.shared.UserList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,61 +27,75 @@ import java.net.URL;
 public class UserServiceImpl extends RemoteServiceServlet implements UserService {
     HttpURLConnection connection;
 
-    @Override
-    public String getUserList(String url) throws UserServiceException {
-        return makeSimpleRequest("GET", url);
+    private class Params {
+        String url = null;
+        String rawData = null;
+        String contentType = null;
+        String requestType = null;
     }
 
     @Override
-    public String deleteUser(String url) throws UserServiceException {
-        return makeSimpleRequest("DELETE", url);
+    public GeneralResponse getUserList(String url) throws UserServiceException {
+        Params params = new Params();
+        params.url = url;
+        params.requestType = "GET";
+        params.contentType = "application/json";
+        return makeRequestJSON(params, UserList.class);
     }
 
     @Override
-    public String updateUser(String url, String userRawData) throws UserServiceException {
-        return makeRequest("PUT", url, userRawData);
+    public GeneralResponse deleteUser(String url) throws UserServiceException {
+        Params params = new Params();
+        params.url = url;
+        params.requestType = "DELETE";
+        params.contentType = "application/json";
+        return makeRequestJSON(params, String.class);
     }
 
     @Override
-    public String saveUser(String url, String userRawData) throws UserServiceException {
-        return makeRequest("POST", url, userRawData);
+    public GeneralResponse updateUser(String url, String userRawData) throws UserServiceException {
+        Params param = new Params();
+        param.url = url;
+        param.requestType = "PUT";
+        param.rawData = userRawData;
+        param.requestType = "application/x-www-form-urlencoded";
+        return makeRequestJSON(param, String.class);
+    }
+
+    @Override
+    public GeneralResponse saveUser(String url, String userRawData) throws UserServiceException {
+        Params param = new Params();
+        param.url = url;
+        param.requestType = "POST";
+        param.rawData = userRawData;
+        param.requestType = "application/x-www-form-urlencoded";
+        return makeRequestJSON(param, User.class);
     }
 
     /**
-     * expect POST, PUT
-     *
-     * @param requestType  type of request (POST, PUT)
-     * @param url  url string
-     * @param rawData  data in encoded view
-     * @return  result of request
+     * @return result of request
      * @throws UserServiceException
      */
-    private String makeRequest(String requestType, String url, String rawData) throws UserServiceException{
+    @SuppressWarnings("unused")
+    private <T> GeneralResponse<T> makeRequestJSON(Params params, Class<T> type) throws UserServiceException {
         try {
-            URL u = new URL(url);
+            URL u = new URL(params.url);
             connection = (HttpURLConnection) u.openConnection();
 
             //config connection
-            //connection.setRequestProperty("Content-type", "application/json");
-            connection.setRequestMethod(requestType);
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestMethod(params.requestType);
+            connection.setRequestProperty("Content-Type", params.contentType);
             connection.setRequestProperty("charset", "utf-8");
-            connection.setRequestProperty("Content-Length", "" + Integer.toString(rawData.getBytes().length));
             connection.setUseCaches(false);
-            connection.setDoOutput(true);
 
             //send data
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(rawData);
-            writer.flush();
-            writer.close();
-
-            int responseCode = connection.getResponseCode();
-
-            if (responseCode != 200) {
-                //take message from server
-                //try to get error message
-                throw new UserServiceException("Error in server response" + responseCode);
+            if (params.rawData != null) {
+                connection.setRequestProperty("Content-Length", "" + Integer.toString(params.rawData.getBytes().length));
+                connection.setDoOutput(true);
+                OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+                writer.write(params.rawData);
+                writer.flush();
+                writer.close();
             }
 
             //take response
@@ -93,57 +109,38 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
             reader.close();
 
-            return response.toString();
-        } catch (MalformedURLException e) {
-            throw new UserServiceException(e.getMessage());
-        } catch (IOException e) {
-            throw new UserServiceException(e.getMessage());
-        } finally {
-            connection.disconnect();
-        }
+            // parse response as JSON object
 
-    }
+            //define JSON parser
+            ObjectMapper mapper = new ObjectMapper();
 
-    /**
-     * expect GET, DELETE
-     *
-     * @param requestType type of the request
-     * @param url         url of the request
-     * @return
-     */
-    private String makeSimpleRequest(String requestType, String url) throws UserServiceException {
-        try {
-            URL u = new URL(url);
-            connection = (HttpURLConnection) u.openConnection();
+            //parse response
+            GeneralResponse<T> parsedResponse = mapper.readValue(response.toString(),
+                    new TypeReference<T>() { });
 
-            //config connection
-            connection.setRequestProperty("Content-type", "application/json");
-            connection.setRequestMethod(requestType);
-
-            //get data
+            //check if we have an error response code
             int responseCode = connection.getResponseCode();
 
             if (responseCode != 200) {
-                //take message from server
-                //try to get error message
-                throw new UserServiceException("Error in server response" + responseCode);
+
+                //take error server message
+                throw new UserServiceException("Server code: "
+                        + responseCode
+                        + "\n Error Message: "
+                        + parsedResponse.error);
             }
 
-            //successfully
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
 
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-
-            in.close();
-
-            return (response.toString());
-
+            return parsedResponse;
         } catch (MalformedURLException e) {
             throw new UserServiceException(e.getMessage());
+        } catch (JsonMappingException e) {
+            try {
+                int responseCode = connection.getResponseCode();
+                throw new UserServiceException("Server code: " + responseCode + "\n Error Message: " + e.getMessage());
+            } catch (IOException e1) {
+                throw new UserServiceException(e.getMessage());
+            }
         } catch (IOException e) {
             throw new UserServiceException(e.getMessage());
         } finally {

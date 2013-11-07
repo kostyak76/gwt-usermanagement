@@ -1,14 +1,13 @@
 package com.logicify.learn.client.views;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.logicify.learn.shared.User;
 import com.logicify.learn.client.presenters.UserPresenter;
 
@@ -29,10 +28,19 @@ public class UserView extends Composite implements UserPresenter.View {
     TextBox firstName;
 
     @UiField
+    DivElement firstNameError;
+
+    @UiField
     TextBox lastName;
 
     @UiField
+    DivElement lastNameError;
+
+    @UiField
     TextBox email;
+
+    @UiField
+    DivElement emailError;
 
     @UiField
     Button okButton;
@@ -44,8 +52,35 @@ public class UserView extends Composite implements UserPresenter.View {
     Button clearButton;
 
     @UiHandler("clearButton")
-    void clearMethod(MouseMoveEvent event){
+    void clearMethod(ClickEvent event) {
         clearFormData();
+    }
+
+    @UiHandler("firstName")
+    void changeFirstName(KeyUpEvent event) {
+        if (checkFirstName()) {
+            firstNameError.addClassName("lg-hidden");
+        } else {
+            firstNameError.removeClassName("lg-hidden");
+        }
+    }
+
+    @UiHandler("lastName")
+    void changeLastName(KeyUpEvent event) {
+        if (checkLastName()) {
+            lastNameError.addClassName("lg-hidden");
+        } else {
+            lastNameError.removeClassName("lg-hidden");
+        }
+    }
+
+    @UiHandler("email")
+    void changeEmail(KeyUpEvent event) {
+        if (checkEmail()) {
+            emailError.addClassName("lg-hidden");
+        } else {
+            emailError.removeClassName("lg-hidden");
+        }
     }
 
     public UserView() {
@@ -58,7 +93,7 @@ public class UserView extends Composite implements UserPresenter.View {
     /**
      * sets empty form field
      */
-    private void clearFormData(){
+    private void clearFormData() {
         firstName.setText("");
         lastName.setText("");
         email.setText("");
@@ -108,9 +143,71 @@ public class UserView extends Composite implements UserPresenter.View {
         _stateHelper(false);
     }
 
-    private void _stateHelper(Boolean isAddState){
+    private void _stateHelper(Boolean isAddState) {
         okButton.setVisible(isAddState);
         clearButton.setVisible(isAddState);
         updateButton.setVisible(!isAddState);
+    }
+
+    /**
+     * check if data valid
+     *
+     * @return result of checks
+     */
+    @Override
+    public boolean isDataValid() {
+
+        boolean response = true;
+
+        //check firstName
+        if (!checkFirstName()) {
+            response = false;
+        }
+
+        //check lastName
+        if (!checkLastName()) {
+            response = false;
+        }
+
+        //check email
+        if (!checkEmail()) {
+            response = false;
+        }
+
+        return response;
+    }
+
+    private boolean checkFirstName() {
+        int min = 1;
+        int max = 10;
+        String value = firstName.getText();
+        return isLengthBetween(min, max, value);
+    }
+
+    private boolean checkLastName() {
+        int min = 1;
+        int max = 20;
+        String value = lastName.getText();
+        return isLengthBetween(min, max, value);
+    }
+
+    private boolean checkEmail() {
+        String value = email.getValue();
+        return isValidEmail(value);
+    }
+
+    private boolean isLengthBetween(int min, int max, String valueForCheck) {
+        int currentLength = valueForCheck.length();
+
+        if (currentLength >= min && currentLength <= max) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isValidEmail(String email) {
+
+        RegExp regExp = RegExp.compile("^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$", "i");
+        return regExp.test(email);
     }
 }

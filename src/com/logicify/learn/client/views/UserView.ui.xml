@@ -3,9 +3,14 @@
     <g:HTMLPanel>
         <fieldset>
             <legend>Add/Edit User</legend>
-            <label>First Name: </label><g:TextBox ui:field='firstName'></g:TextBox><br/>
-            <label>Last Name: </label><g:TextBox ui:field="lastName"></g:TextBox><br/>
-            <label>e-mail:</label><g:TextBox ui:field="email"></g:TextBox><br/>
+            <div ui:field="firstNameError" class="lg-hidden serverResponseLabelError">This value have to be min 1 and max 10 characters long.</div>
+            <label>First Name: </label><g:TextBox ui:field='firstName' /><br/>
+
+            <div ui:field="lastNameError" class="lg-hidden serverResponseLabelError">This value have to be min 1 and max 20 characters long.</div>
+            <label>Last Name: </label><g:TextBox ui:field="lastName" /><br/>
+
+            <div ui:field="emailError" class="lg-hidden serverResponseLabelError">It is wrong email.</div>
+            <label>e-mail:</label><g:TextBox ui:field="email" /><br/>
             <g:Button ui:field="okButton">Save</g:Button>
             <g:Button ui:field="updateButton">Update</g:Button>
             <g:Button ui:field="clearButton">Clear</g:Button>

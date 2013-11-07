@@ -50,6 +50,9 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
 
         //need update state view
         public void viewForUpdate();
+
+        //need to check form data
+        public boolean isDataValid();
     }
 
     public UserPresenter(View view, UserServiceAsync rpcService, HasWidgets holder) {
@@ -91,6 +94,12 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
         okButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
+                //check for data valid
+                if(!view.isDataValid()){
+                    Window.alert("Correct some data and try again...");
+                    return;
+                }
+
                 // getData as formString
                 String formString = view.getFormData();
                 String url = Config.API_URL+"user";
@@ -114,7 +123,6 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
                 // create a add request
                 rpcService.saveUser(url, formString, asyncCallback);
 
-
             }
         });
 
@@ -123,6 +131,12 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
         updateButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
+                //check for data valid
+                if(!view.isDataValid()){
+                    Window.alert("Correct some data and try again...");
+                    return;
+                }
+
                 //To change body of implemented methods use File | Settings | File Templates.
                 User currentUser = getCurrentUSer();
                 if (currentUser == null) {

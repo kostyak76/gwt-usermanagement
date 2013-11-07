@@ -2,13 +2,12 @@ package com.logicify.learn.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.*;
+import com.logicify.learn.client.common.AppUtils;
+import com.logicify.learn.client.events.*;
 import com.logicify.learn.shared.User;
 import com.logicify.learn.client.presenters.UserListPresenter;
-import com.logicify.learn.client.presenters.UserListPresenterListener;
 import com.logicify.learn.client.presenters.UserPresenter;
-import com.logicify.learn.client.presenters.UserPresenterListener;
-import com.logicify.learn.client.views.UserListView;
-import com.logicify.learn.client.views.UserView;
+import com.logicify.learn.client.views.*;
 
 public class UserManagement implements EntryPoint {
     /**
@@ -60,16 +59,18 @@ public class UserManagement implements EntryPoint {
         //create first part of UI
         UserListView listView = new UserListView();
         userListPresenter = new UserListPresenter(listView, rpcService, listHolder);
-        userListPresenter.addListener(new UserListPresenterListener() {
+
+        AppUtils.EVENT_BUS.addHandler(AddUserEvent.TYPE, new AddUserEventHandler() {
             @Override
-            public void onAddButtonEvent() {
-                //userHolder.setVisible(true);
+            public void onAddUserEvent(AddUserEvent event) {
                 userHolder.setVisible(true);
                 userPresenter.present();
             }
+        });
 
+        AppUtils.EVENT_BUS.addHandler(EditUserEvent.TYPE, new EditUserEventHandler() {
             @Override
-            public void onEditEvent(User user) {
+            public void onEditEvent(EditUserEvent event, User user) {
                 //clear userHolder
                 userHolder.setVisible(true);
                 userPresenter.present();
@@ -78,6 +79,7 @@ public class UserManagement implements EntryPoint {
                 userPresenter.setUser(user);
             }
         });
+
         userListPresenter.present();
     }
 
@@ -88,20 +90,22 @@ public class UserManagement implements EntryPoint {
         //init different presenters
         userPresenter = new UserPresenter(userView, rpcService, userHolder);
 
-        //userPresenter.present();
-
-        userPresenter.addListener(new UserPresenterListener() {
+        //added event handlers
+        AppUtils.EVENT_BUS.addHandler(UserAddedEvent.TYPE, new UserAddedEventHandler(){
             @Override
-            public void onAddButtonEvent() {
-                userHolder.setVisible(false);
-                userListPresenter.present();
-            }
-
-            @Override
-            public void onUpdatedEvent() {
+            public void onUserAdded(UserAddedEvent event) {
                 userHolder.setVisible(false);
                 userListPresenter.present();
             }
         });
+
+        AppUtils.EVENT_BUS.addHandler(UserUpdatedEvent.TYPE, new UserUpdatedEventHandler() {
+            @Override
+            public void onUserUpdated(UserUpdatedEvent event) {
+                userHolder.setVisible(false);
+                userListPresenter.present();
+            }
+        });
+
     }
 }

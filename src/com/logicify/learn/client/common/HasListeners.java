@@ -1,7 +1,5 @@
 package com.logicify.learn.client.common;
 
-import com.logicify.learn.client.presenters.UserPresenterListener;
-
 import java.util.ArrayList;
 
 /**

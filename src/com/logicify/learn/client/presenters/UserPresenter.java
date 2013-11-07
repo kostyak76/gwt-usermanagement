@@ -9,10 +9,10 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
 import com.logicify.learn.client.AsyncCallbackJSON;
 import com.logicify.learn.client.UserServiceAsync;
+import com.logicify.learn.client.common.AppUtils;
 import com.logicify.learn.client.common.Config;
-import com.logicify.learn.client.common.HasListeners;
-import com.logicify.learn.client.common.Listener;
-import com.logicify.learn.client.common.NotifyListenersCallback;
+import com.logicify.learn.client.events.UserAddedEvent;
+import com.logicify.learn.client.events.UserUpdatedEvent;
 import com.logicify.learn.shared.GeneralResponse;
 import com.logicify.learn.shared.User;
 
@@ -22,7 +22,7 @@ import com.logicify.learn.shared.User;
  * Date: 11/4/13
  * Time: 10:11 PM
  */
-public class UserPresenter extends HasListeners<UserPresenterListener> implements Presenter {
+public class UserPresenter implements Presenter {
 
     View view;
     UserServiceAsync rpcService;
@@ -109,14 +109,8 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
 
                         Window.alert("Added successfully");
 
-                        // notify listeners
-                        notifyListeners(new NotifyListenersCallback() {
-                            @Override
-                            public void onCallback(Listener listener) {
-                                UserPresenterListener userListener = (UserPresenterListener) listener;
-                                userListener.onAddButtonEvent();
-                            }
-                        });
+                        AppUtils.EVENT_BUS.fireEvent(new UserAddedEvent());
+
                     }
                 };
 
@@ -151,14 +145,8 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
                     public void doStuffWithObject(GeneralResponse obj) {
                         Window.alert("Updated successfully");
 
-                        //notify listeners
-                        notifyListeners(new NotifyListenersCallback() {
-                            @Override
-                            public void onCallback(Listener listener) {
-                                UserPresenterListener userListener = (UserPresenterListener) listener;
-                                userListener.onUpdatedEvent();
-                            }
-                        });
+                        AppUtils.EVENT_BUS.fireEvent(new UserUpdatedEvent());
+
                     }
                 };
 
@@ -170,7 +158,7 @@ public class UserPresenter extends HasListeners<UserPresenterListener> implement
     /**
      * to use with callback
      *
-     * @return
+     * @return  return current user
      */
     private User getCurrentUSer() {
         return user;

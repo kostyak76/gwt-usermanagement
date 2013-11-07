@@ -9,10 +9,10 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
 import com.logicify.learn.client.AsyncCallbackJSON;
+import com.logicify.learn.client.common.AppUtils;
 import com.logicify.learn.client.common.Config;
-import com.logicify.learn.client.common.HasListeners;
-import com.logicify.learn.client.common.Listener;
-import com.logicify.learn.client.common.NotifyListenersCallback;
+import com.logicify.learn.client.events.AddUserEvent;
+import com.logicify.learn.client.events.EditUserEvent;
 import com.logicify.learn.shared.GeneralResponse;
 import com.logicify.learn.shared.User;
 import com.logicify.learn.shared.UserList;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
  *         Date: 11/4/13
  *         Time: 11:07 AM
  */
-public class UserListPresenter extends HasListeners<UserListPresenterListener> implements Presenter {
+public class UserListPresenter implements Presenter {
     private View view;
     private UserServiceAsync rpcService;
     /**
@@ -82,7 +82,7 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
         };
 
         //get data
-        String url = Config.API_URL+"users";
+        String url = Config.API_URL + "users";
         rpcService.getUserList(url, callback);
     }
 
@@ -100,14 +100,9 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
         view.getAddButton().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(final ClickEvent event) {
-                //is simply notify all listeners
-                notifyListeners(new NotifyListenersCallback() {
-                    @Override
-                    public void onCallback(Listener listener) {
-                        UserListPresenterListener userListener= (UserListPresenterListener) listener;
-                        userListener.onAddButtonEvent();
-                    }
-                });
+
+                AppUtils.EVENT_BUS.fireEvent(new AddUserEvent());
+
             }
         });
 
@@ -126,28 +121,23 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
                 final int id = view.getClickedRow(event);
 
                 //check if id is positive number
-                if(id == -1){
+                if (id == -1) {
                     return;
                 }
 
-                //notify listener with User
-                notifyListeners(new NotifyListenersCallback() {
-                    @Override
-                    public void onCallback(Listener listener) {
-                        UserListPresenterListener userListener = (UserListPresenterListener) listener;
-                        userListener.onEditEvent((User) userList.get(id));
-                    }
-                });
+                AppUtils.EVENT_BUS.fireEvent(new EditUserEvent(userList.get(id)));
+
             }
         });
     }
 
     /**
      * first variant of defining ID in Button and sending directly to the click callback
+     *
      * @param delButton button to be binded
-     * @param i id number of button
+     * @param i         id number of button
      */
-    private void defineClickHandler(Button delButton, final int i){
+    private void defineClickHandler(Button delButton, final int i) {
         delButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(final ClickEvent event) {
@@ -156,9 +146,9 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
         });
     }
 
-    private void deleteUser(int i){
+    private void deleteUser(int i) {
 
-        if(!Window.confirm("Are you sure about to delete an item?")){
+        if (!Window.confirm("Are you sure about to delete an item?")) {
             return;
         }
 
@@ -168,9 +158,9 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
                 getUserListAndInitView();
             }
         };
-        User user = (User) userList.get(i);
+        User user = userList.get(i);
         String userId = user._id;
-        String url = Config.API_URL+"user/"+userId;
+        String url = Config.API_URL + "user/" + userId;
 
         rpcService.deleteUser(url, asyncCallback);
     }

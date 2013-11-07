@@ -88,6 +88,13 @@ public class UserView extends Composite implements UserPresenter.View {
 
         //init default state
         viewForAdd();
+        errorDefaultState();
+    }
+
+    private void errorDefaultState(){
+        firstNameError.addClassName("lg-hidden");
+        lastNameError.addClassName("lg-hidden");
+        emailError.addClassName("lg-hidden");
     }
 
     /**
@@ -128,6 +135,7 @@ public class UserView extends Composite implements UserPresenter.View {
         firstName.setText(user.firstName);
         lastName.setText(user.lastName);
         email.setText(user.email);
+        errorDefaultState();
     }
 
     @Override

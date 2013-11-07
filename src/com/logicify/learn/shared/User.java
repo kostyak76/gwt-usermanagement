@@ -8,11 +8,13 @@ import java.io.Serializable;
  * Date: 10/31/13
  * Time: 3:52 PM
  */
-public class User implements Serializable {
+public class User implements Serializable,RpcResolver {
 
     public String firstName;
     public String lastName;
     public String email;
     public String _id;
 
+    public User() {
+    }
 }

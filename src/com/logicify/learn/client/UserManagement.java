@@ -43,7 +43,6 @@ public class UserManagement implements EntryPoint {
         //* init userList presenter
         initUserListView(listHolder);
 
-
         //## init user view
         //* define placeholder for them
         mainHolder.add(userHolder);

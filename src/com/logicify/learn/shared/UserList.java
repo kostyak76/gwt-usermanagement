@@ -9,5 +9,8 @@ import java.util.ArrayList;
  * Date: 10/31/13
  * Time: 3:51 PM
  */
-public class UserList<T> extends ArrayList<T> implements Serializable {
+public class UserList extends ArrayList<User> implements Serializable, RpcResolver{
+
+    public UserList() {
+    }
 }

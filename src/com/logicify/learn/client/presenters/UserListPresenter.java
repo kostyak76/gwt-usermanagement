@@ -2,7 +2,6 @@ package com.logicify.learn.client.presenters;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -15,6 +14,7 @@ import com.logicify.learn.client.common.HasListeners;
 import com.logicify.learn.client.common.Listener;
 import com.logicify.learn.client.common.NotifyListenersCallback;
 import com.logicify.learn.shared.GeneralResponse;
+import com.logicify.learn.shared.GeneralResponseUserList;
 import com.logicify.learn.shared.User;
 import com.logicify.learn.shared.UserList;
 import com.logicify.learn.client.UserServiceAsync;
@@ -78,7 +78,8 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
             public void doStuffWithObject(GeneralResponse obj) {
                 // convert data
                 //userList = (UserList) obj.get("data").isArray().getJavaScriptObject();
-                userList = (UserList) obj.data;
+                GeneralResponseUserList data = (GeneralResponseUserList) obj;
+                userList = (UserList) data.data;
                 initView();
             }
         };

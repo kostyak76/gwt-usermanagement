@@ -9,10 +9,10 @@ import java.io.Serializable;
  * Date: 11/6/13
  * Time: 1:35 PM
  */
-public class GeneralResponse implements Serializable {
+public class GeneralResponse<T extends Serializable> implements Serializable {
 
     public String error;
-    //public T data;
+    public T data;
 
     public GeneralResponse() {
     }

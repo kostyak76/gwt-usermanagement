@@ -1,6 +1,6 @@
 package com.logicify.learn.server;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -8,14 +8,10 @@ import com.logicify.learn.client.UserService;
 import com.logicify.learn.client.UserServiceException;
 import com.logicify.learn.shared.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,7 +35,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
         params.url = url;
         params.requestType = "GET";
         params.contentType = "application/json";
-        return makeRequestJSON(params, new GeneralResponseUserList());
+        return makeRequestJSON(params, UserList.class);
     }
 
     @Override
@@ -48,7 +44,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
         params.url = url;
         params.requestType = "DELETE";
         params.contentType = "application/json";
-        return makeRequestJSON(params, new GeneralResponseString());
+        return makeRequestJSON(params, String.class);
     }
 
     @Override
@@ -58,7 +54,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
         param.requestType = "PUT";
         param.rawData = userRawData;
         param.contentType = "application/x-www-form-urlencoded";
-        return makeRequestJSON(param, new GeneralResponseString());
+        return makeRequestJSON(param, String.class);
     }
 
     @Override
@@ -68,7 +64,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
         param.requestType = "POST";
         param.rawData = userRawData;
         param.contentType = "application/x-www-form-urlencoded";
-        return makeRequestJSON(param, new GeneralResponseUserList());
+        return makeRequestJSON(param, UserList.class);
     }
 
     /**
@@ -76,7 +72,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
      * @throws UserServiceException
      */
     @SuppressWarnings("unused")
-    private GeneralResponse makeRequestJSON(Params params, GeneralResponse type) throws UserServiceException {
+    private <T extends Serializable> GeneralResponse makeRequestJSON(Params params, Class<T> type) throws UserServiceException {
         try {
             URL u = new URL(params.url);
             connection = (HttpURLConnection) u.openConnection();
@@ -113,17 +109,11 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
             //define JSON parser
             ObjectMapper mapper = new ObjectMapper();
 
-            //parse response
-            GeneralResponse parsedResponse = type;
-            //todo create better implementation
-            if (type instanceof GeneralResponseUser) {
-                parsedResponse = mapper.readValue(response.toString(), GeneralResponseUser.class);
-            } else if (type instanceof GeneralResponseString) {
-                parsedResponse = mapper.readValue(response.toString(), GeneralResponseString.class);
-            } else if (type instanceof GeneralResponseUserList) {
-                parsedResponse = mapper.readValue(response.toString(), GeneralResponseUserList.class);
-            }
+            //create parametric type, as we use generic
+            JavaType javaType =  mapper.getTypeFactory().constructParametricType(GeneralResponse.class, type);
 
+            //parse response
+            GeneralResponse<T> parsedResponse = mapper.readValue(response.toString(), javaType);
 
             //check if we have an error response code
             int responseCode = connection.getResponseCode();
@@ -139,6 +129,7 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
 
             return parsedResponse;
+
         } catch (MalformedURLException e) {
             throw new UserServiceException(e.getMessage());
         } catch (JsonMappingException e) {

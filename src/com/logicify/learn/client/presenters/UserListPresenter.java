@@ -14,7 +14,6 @@ import com.logicify.learn.client.common.HasListeners;
 import com.logicify.learn.client.common.Listener;
 import com.logicify.learn.client.common.NotifyListenersCallback;
 import com.logicify.learn.shared.GeneralResponse;
-import com.logicify.learn.shared.GeneralResponseUserList;
 import com.logicify.learn.shared.User;
 import com.logicify.learn.shared.UserList;
 import com.logicify.learn.client.UserServiceAsync;
@@ -77,9 +76,7 @@ public class UserListPresenter extends HasListeners<UserListPresenterListener> i
             @Override
             public void doStuffWithObject(GeneralResponse obj) {
                 // convert data
-                //userList = (UserList) obj.get("data").isArray().getJavaScriptObject();
-                GeneralResponseUserList data = (GeneralResponseUserList) obj;
-                userList = (UserList) data.data;
+                userList = (UserList) obj.data;
                 initView();
             }
         };
